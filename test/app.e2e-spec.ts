@@ -38,4 +38,10 @@ describe('Auth contract (e2e)', () => {
       .set('Authorization', 'Bearer token-invalido')
       .expect(401);
   });
+
+  // La ruta de staff también pasa primero por el guard JWT: sin token es
+  // 401 y nunca llega a consultar el rol en Core.
+  it('GET /me/staff sin token responde 401', () => {
+    return request(app.getHttpServer()).get('/me/staff').expect(401);
+  });
 });

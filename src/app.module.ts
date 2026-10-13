@@ -6,6 +6,7 @@ import { InnlabApiModule } from './innlab-api/innlab-api.module';
 import { HealthModule } from './health/health.module';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { RolesGuard } from './auth/guards/roles.guard';
+import { ProductRoleGuard } from './auth/guards/product-role.guard';
 import { MeModule } from './modules/me/me.module';
 
 // Agrega aquí tus módulos de negocio (imports[]) a medida que los crees.
@@ -17,6 +18,8 @@ import { MeModule } from './modules/me/me.module';
   providers: [
     { provide: APP_GUARD, useClass: JwtAuthGuard },
     { provide: APP_GUARD, useClass: RolesGuard },
+    // Después de JwtAuthGuard: necesita req.user para consultar el rol en Core
+    { provide: APP_GUARD, useClass: ProductRoleGuard },
   ],
 })
 export class AppModule {}

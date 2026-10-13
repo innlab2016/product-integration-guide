@@ -5,6 +5,7 @@ import { firstValueFrom } from 'rxjs';
 import {
   UserContext,
   UserFeatures,
+  UserProductRole,
   CompanyMembers,
   ProductAccess,
 } from './interfaces/innlab-user.interface';
@@ -14,8 +15,8 @@ import {
 //
 // CAMBIA 'tu-producto' abajo por el slug real que Core te asignó
 // en la tabla Product (ej. 'inndex', 'ucorp'). Ese slug es el mismo
-// que usan los endpoints ?product=... y el body de /roles/assign.
-const PRODUCT_SLUG = 'tu-producto';
+// que usan los endpoints ?product=... y el que aparece en productRoles.
+export const PRODUCT_SLUG = 'tu-producto';
 
 @Injectable()
 export class InnlabApiService {
@@ -41,6 +42,18 @@ export class InnlabApiService {
     const response = await firstValueFrom(
       this.httpService.get<UserFeatures>(
         `/internal/users/${userId}/features?product=${PRODUCT_SLUG}`,
+        { headers: this.internalHeaders() },
+      ),
+    );
+    return response.data;
+  }
+
+  // Rol de staff (admin | staff) del usuario en este producto, o null.
+  // Es lo que consulta ProductRoleGuard para las rutas con @ProductRoles().
+  async getUserProductRole(userId: string): Promise<UserProductRole> {
+    const response = await firstValueFrom(
+      this.httpService.get<UserProductRole>(
+        `/internal/users/${userId}/product-role?product=${PRODUCT_SLUG}`,
         { headers: this.internalHeaders() },
       ),
     );
@@ -75,17 +88,7 @@ export class InnlabApiService {
     return response.data;
   }
 
-  // AVISO: este endpoint existe en Core pero es un stub — responde
-  // { assigned: true } sin escribir nada en base de datos todavía.
-  // Déjalo aquí para cuando Core lo implemente, pero no dependas de
-  // que persista un rol real hoy.
-  async assignRole(userId: string, role: string): Promise<void> {
-    await firstValueFrom(
-      this.httpService.post(
-        `/internal/roles/assign`,
-        { userId, product: PRODUCT_SLUG, role },
-        { headers: this.internalHeaders() },
-      ),
-    );
-  }
+  // No hay método para asignar roles: POST /internal/roles/assign ya no
+  // existe en Core. Los roles de staff se gestionan en el propio Core
+  // (/api/admin/staff) y los productos solo los consultan.
 }

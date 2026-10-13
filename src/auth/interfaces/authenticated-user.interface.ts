@@ -1,3 +1,5 @@
+import type { ProductRoleName } from '../../innlab-api/interfaces/innlab-user.interface';
+
 // Forma de req.user una vez pasado por JwtAuthGuard.
 //
 // IMPORTANTE — companyId / companyRole / workspaceId NO vienen del token.
@@ -16,4 +18,7 @@ export interface AuthenticatedUser {
   companyId?: string;
   companyRole?: string;
   workspaceId?: string;
+  // Rol de staff en este producto. Lo llena ProductRoleGuard, y solo en las
+  // rutas marcadas con @ProductRoles(); en el resto queda undefined.
+  productRole?: ProductRoleName;
 }

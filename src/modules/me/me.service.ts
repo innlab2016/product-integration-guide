@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { InnlabApiService } from '../../innlab-api/innlab-api.service';
+import { InnlabApiService, PRODUCT_SLUG } from '../../innlab-api/innlab-api.service';
 import { AuthenticatedUser } from '../../auth/interfaces/authenticated-user.interface';
 
 /**
@@ -40,10 +40,18 @@ export class MeService {
       },
       // Del Core API — datos que viven en innlab_core DB
       core: {
+        // 'internal' = staff del Innlab: no tiene empresa (companyId null,
+        // companies []). No asumas que todo usuario trae companyId.
+        accountType: coreContext.accountType,
+        status: coreContext.status,
         companyId: coreContext.companyId,
         companyRole: coreContext.companyRole,
         companies: coreContext.companies,
       },
+      // Rol de staff en este producto; null para clientes y para staff de
+      // otros productos. productRoles trae los de todos los productos.
+      productRole:
+        coreContext.productRoles.find((r) => r.product === PRODUCT_SLUG)?.role ?? null,
       // Features habilitados en este producto para este usuario
       features,
     };
